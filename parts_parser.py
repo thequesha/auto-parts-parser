@@ -19,10 +19,19 @@ cars_select = wait.until(EC.element_to_be_clickable((driver.find_element(By.XPAT
 ActionChains(driver).click(cars_select).perform()
 
 all_car_options = cars_select.find_elements(By.TAG_NAME, 'option')
+
+cars =[]
 for option in all_car_options:
     val = option.get_attribute("value").strip()
     if(val):
-        print(f"Value is: {val}")
+        car = {
+            'name': option.text,
+            'code': val
+        }
+        cars.append(car)
+        
+        
+        print(f"Car is: {car['name']}")
 
 
 time.sleep(10)
