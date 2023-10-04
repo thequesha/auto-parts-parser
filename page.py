@@ -2,6 +2,7 @@ from element import BasePageElement
 from locators import MainPageLocators
 from locators import BasePageLocators
 from selenium.webdriver.common.by import By
+import time
 
 
 class SearchTextElement(BasePageElement):
@@ -28,48 +29,67 @@ class BasePage(object):
         current_lang = self.driver.find_element(
             *BasePageLocators.CURRENT_LANG_IMAGE).get_attribute('alt')
 
-        # if alt attr is == lang then do nothing
-
-        # else
-        if (current_lang != lang):
+        if current_lang != lang:
             user_dropdown.click()
             lang_dropdown = self.driver.find_element(
                 *BasePageLocators.LANG_DROPDOWN)
             lang_dropdown.click()
             lang_dropdown_options = lang_dropdown.find_elements(
                 By.TAG_NAME, 'li')
-            print(lang_dropdown_options)
 
             for lang_option in lang_dropdown_options:
-                print(lang_option)
+                lang_option_value = lang_option.find_element(
+                    By.TAG_NAME, 'img').get_attribute('alt')
+                if lang_option_value == lang:
+                    lang_option.click()
+                    break
 
-        # click to dropdown
+    def closeCookieNotification(self):
+        """Closes Cookie notification"""
+        notification = self.driver.find_element(
+            *BasePageLocators.COOKIE_NOTIFICATION)
 
-        # find element with img(attr == lang) and click to it
+        if notification:
+            notification.click()
 
 
 class MainPage(BasePage):
     """Home page action methods come here. I.e. Python.org"""
 
-    # Declares a variable that will contain the retrieved text
-    search_text_element = SearchTextElement()
+    def openCarMarkOptions(self, get_options=False):
+        """Opens Car Mark Options"""
+        carsTab = self.driver.find_element(*MainPageLocators.CARS_TAB)
+        carsTab.click()
+        carsSelect = self.driver.find_element(*MainPageLocators.CARS_SELECT)
+        carsSelect.click()
+        time.sleep(5)
 
-    def is_title_matches(self):
-        """Verifies that the hardcoded text "Python" appears in page title"""
+        all_car_options = carsSelect.find_elements(By.TAG_NAME, 'option')
 
-        return "Python" in self.driver.title
+        car_options = []
 
-    def click_go_button(self):
-        """Triggers the search"""
+        if get_options:
+            for option in all_car_options:
+                val = option.get_attribute("value").strip()
+                if val:
+                    car = {
+                        'name': option.text,
+                        'code': val
+                    }
+                    car_options.append(car)
 
-        # element = self.driver.find_element(*MainPageLocators.GO_BUTTON)
-        # element.click()
+                    print(f"Car is: {car['name']}")
 
+            return car_options
 
-class SearchResultsPage(BasePage):
-    """Search results page action methods come here"""
+        return []
 
-    def is_results_found(self):
-        # Probably should search for this text in the specific page
-        # element, but as for now it works fine
-        return "No results found." not in self.driver.page_source
+    def clickToOption(self, car_option):
+        """clicks to option"""
+        carsSelect = self.driver.find_element(*MainPageLocators.CARS_SELECT)
+        all_car_options = carsSelect.find_elements(By.TAG_NAME, 'option')
+        for option in all_car_options:
+            val = option.get_attribute("value").strip()
+            if val == car_option['code']:
+                option.click()
+                break

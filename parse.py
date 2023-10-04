@@ -20,8 +20,15 @@ class PartsParser:
 
         # change language ro Russian
         base_page.changeLang('Русский')
+        base_page.closeCookieNotification()
 
-        # Change language to Russian
+        main_page = page.MainPage(self.driver)
+        car_options = main_page.openCarMarkOptions(True)
+
+        while len(car_options):
+            car_option = car_options.pop(0)
+            main_page.openCarMarkOptions()
+            main_page.clickToOption(car_option)
 
         # Tap To Models Tab and open options
 
@@ -35,4 +42,4 @@ class PartsParser:
     def setUp(self):
         """initial setup"""
         self.driver.get("https://emexdwc.ae/")
-        self.driver.maximize_window
+        self.driver.maximize_window()
