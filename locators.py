@@ -7,7 +7,8 @@ class BasePageLocators(object):
     USER_DROPDOWN = (By.ID, 'userDropdown')
     CURRENT_LANG_IMAGE = (By.ID, 'ucHeader_ucLangFlagSelector_imgCurLangFlag')
     LANG_DROPDOWN = (By.XPATH, '//*[@id="userDropdown"]/ul/li[5]/div')
-    COOKIE_NOTIFICATION = (By.XPATH, '//*[@id="divCookiePolicy"]/div/button')
+    COOKIE_NOTIFICATION = (By.CSS_SELECTOR, '#divCookiePolicy button')
+    SEARCH_BUTTON = (By.CSS_SELECTOR, '.tabs .active .input-group-btn')
 
 
 class MainPageLocators(object):
@@ -16,7 +17,28 @@ class MainPageLocators(object):
     CARS_SELECT = (By.XPATH, '//*[@id="tab4"]/div/select')
 
 
-class SearchResultsPageLocators(object):
-    """A class for search results locators. All search results locators should come here"""
+class MarkPageLocators(object):
+    """A class for mark page locators. All mark page locators should come here"""
+    MODELS_SELECT = (
+        By.CSS_SELECTOR, '.panel select:first-of-type')
+    MODEL_SPAN = (
+        By.CSS_SELECTOR, '.panel span:first-of-type')
 
-    pass
+    SUBMIT_BUTTON = (By.CSS_SELECTOR, '.panel-footer input')
+    SELECTS = (By.CSS_SELECTOR, '.panel .form-group')
+    FORM_GROUP_SELECTS = (By.CSS_SELECTOR, '.panel select')
+
+
+class VehiclePageLocators(object):
+    NOT_FIRST_ROW = (By.CSS_SELECTOR, '.guayaquil_table tr:not(:first-child)')
+    CATEGORY_NODES = (By.CSS_SELECTOR, '#qgTree > ul > li')
+    CATEGORY_LEAFS = (By.CSS_SELECTOR, '.qgExpandLeaf')
+    CATEGORY_PARENT = (
+        By.XPATH, ".//ancestor::li[@class='qgNode qgExpandOpen']")
+
+
+class DetailPageLocators(object):
+    NOT_FIRST_ROW = (
+        By.CSS_SELECTOR, '.guayaquil_table .g_collapsed:not(:first-child)')
+    GROUP_NAME = (By.CSS_SELECTOR, '.gdCategory h3:first-child')
+    SUBGROUP_NAME = (By.CSS_SELECTOR, '.gdImageCol a')

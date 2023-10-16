@@ -31,7 +31,6 @@ for option in all_car_options:
         cars.append(car)
         
         
-        print(f"Car is: {car['name']}")
 
 
 time.sleep(10)
