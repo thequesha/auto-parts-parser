@@ -15,5 +15,9 @@ try:
     parser.parse()
 except:
     driver.quit()
+    driver = webdriver.Chrome(service=service)
+
     danger('Something went wrong')
+    parser = PartsParser(driver)
+
     parser.parse()
