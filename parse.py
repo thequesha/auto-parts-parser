@@ -67,41 +67,51 @@ class PartsParser:
             while all_combinations:
                 combo = all_combinations.pop(0)
                 index += 1
-                result = mark_page.selectOption(combo)
-                selects_count = mark_page.countSelects()
-                warning(
-                    f'Checking combo #{index} out of {len(all_combinations)}')
-                if not selects_count and (combo not in parsed_combos):
-                    success(f'Combo #{index} is valid')
-                    
-                    
-                    parameters_list = mark_page.getParameters()
+                try:
+                  
+                    result = mark_page.selectOption(combo)
+                    selects_count = mark_page.countSelects()
+                    warning(
+                        f'Checking combo #{index} out of {len(all_combinations)}')
+                    if not selects_count and (combo not in parsed_combos):
+                        success(f'Combo #{index} is valid')
+                        
+                        
+                        parameters_list = mark_page.getParameters()
 
-                    data['parameters'] = parameters_list
+                        data['parameters'] = parameters_list
+                        
+                        mark_page.submit()
+
+                        vehicle_page = page.VehiclePage(self.driver)
+                        vehicle_rows = vehicle_page.vehicleRows()
+                        vehicle_row_links = []
+                        for row in vehicle_rows:
+                            link = row.find_element(
+                                By.CSS_SELECTOR, 'a').get_attribute('href')
+                            vehicle_row_links.append(link)
+                        for link in vehicle_row_links:
+                            self.driver.get(link)
+                            part_categories_page = page.PartCategoriesPage(
+                                self.driver)
+                            try:
+                                part_categories_page.parseEveryLeafCategory(data)
+                            except:
+                            print('An exception occurred')
+
+                        parsed_combos.append(combo)
+                    else:
+                        if result['invalid_combination']:
+                            all_combinations = filterCombinations(
+                                all_combinations, result['invalid_combination'])
+                        danger(f'Combo #{index} is invalid')
+                        warning('Trying another combo')
                     
-                    mark_page.submit()
-
-                    vehicle_page = page.VehiclePage(self.driver)
-                    vehicle_rows = vehicle_page.vehicleRows()
-                    vehicle_row_links = []
-                    for row in vehicle_rows:
-                        link = row.find_element(
-                            By.CSS_SELECTOR, 'a').get_attribute('href')
-                        vehicle_row_links.append(link)
-                    for link in vehicle_row_links:
-                        self.driver.get(link)
-                        part_categories_page = page.PartCategoriesPage(
-                            self.driver)
-                        part_categories_page.parseEveryLeafCategory(data)
-
-                    parsed_combos.append(combo)
-                else:
-                    if result['invalid_combination']:
-                        all_combinations = filterCombinations(
-                            all_combinations, result['invalid_combination'])
-                    danger(f'Combo #{index} is invalid')
-                    warning('Trying another combo')
-                mark_page.goToBasePage(current_url)
+                except:
+                    mark_page.goToBasePage(current_url)
+                
+                
+                
             # while selects_count:
             #     while all_combinations:
             #         combination = all_combinations.pop(0)
