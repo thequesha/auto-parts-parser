@@ -10,10 +10,10 @@ driver = webdriver.Chrome(service=service)
 parser = PartsParser(driver)
 
 
-while True:
-    try:
-        parser.parse()
-    except:
-        driver.quit()
-        danger('Something went wrong')
-        parser.parse()
+# while True:
+try:
+    parser.parse()
+except:
+    driver.quit()
+    danger('Something went wrong')
+    parser.parse()
