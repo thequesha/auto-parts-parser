@@ -14,5 +14,6 @@ while True:
     try:
         parser.parse()
     except:
+        driver.quit()
         danger('Something went wrong')
         parser.parse()
