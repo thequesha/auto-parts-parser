@@ -8,4 +8,11 @@ service = webdriver.ChromeService(executable_path=chromedriver_path)
 driver = webdriver.Chrome(service=service)
 
 parser = PartsParser(driver)
-parser.parse()
+
+
+while True:
+    try:
+        parser.parse()
+    except:
+        danger('Something went wrong')
+        parser.parse()
