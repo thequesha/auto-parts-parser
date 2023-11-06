@@ -1,4 +1,6 @@
+import http
 from element import BasePageElement
+from http_requests import HttpRequests
 from locators import *
 from helper import *
 from selenium.webdriver.common.by import By
@@ -280,10 +282,16 @@ class MarkPage(BasePage):
         
         form_groups = self.driver.find_elements(By.CSS_SELECTOR, '.panel .form-group')
         for group in form_groups:
+            param = group.find_element(By.CSS_SELECTOR, '.control-label').text
+            option = group.find_element(By.CSS_SELECTOR, 'span').text
+            param_dict = {
+                'param': param,
+                'option': option 
+            }
+            parameters.append(param_dict)
         
         
-        
-        return
+        return parameters
 
 
 def optionsToArray(options):
@@ -313,13 +321,18 @@ class VehiclePage(BasePage):
 
 class PartCategoriesPage(BasePage):
 
-    def parseEveryLeafCategory(self):
+    def parseEveryLeafCategory(self, data = {}):
         wait = WebDriverWait(self.driver, 100)
         wait.until(EC.presence_of_element_located(
             VehiclePageLocators.CATEGORY_NODES))
 
         nodes = self.driver.find_elements(*VehiclePageLocators.CATEGORY_NODES)
         leafs = self.driver.find_elements(*VehiclePageLocators.CATEGORY_LEAFS)
+        
+        car_name = self.driver.find_element(By.CSS_SELECTOR, '#cphBody_qgroupsPanel > h1').text
+        
+        data['car_name'] = car_name
+        
         for plus in self.driver.find_elements(By.CSS_SELECTOR, '.qgExpandClosed > .qgExpand'):
             wait.until(EC.element_to_be_clickable(plus))
             plus.click()
@@ -332,14 +345,14 @@ class PartCategoriesPage(BasePage):
                 parents = temp_leaf.find_elements(
                     *VehiclePageLocators.CATEGORY_PARENT)
             except:
-                parents = []
+                parents = [] 
 
             name_content = temp_leaf.find_element(
                 By.CSS_SELECTOR, ':scope > .qgContent')
 
             name = name_content.text
 
-            success(name)
+            success(name) 
             category_names.append(name)
 
             while parents:
@@ -352,35 +365,97 @@ class PartCategoriesPage(BasePage):
                 success(name)
 
                 category_names.append(name)
+                
+            data['categories'] = category_names
 
-            self.parseCategory(leaf, category_names)
+            self.parseCategory(leaf, data)
 
-    def parseCategory(self, node, category_names=[]):
+    def parseCategory(self, node, data ={}):
         link = node.find_element(
             By.CSS_SELECTOR, ':scope > .qgContent > a').get_attribute('href')
 
-        # self.driver.execute_script(f'''window.open("{link}","_blank");''')
-        # detail_page = DetailPage(self.driver)
-        # detail_page.parse()
+        self.driver.execute_script(f'''window.open("{link}","_blank");''')
+        detail_page = DetailPage(self.driver)
+        detail_page.parse(data)
 
-        # self.driver.close()
-        # self.driver.switch_to.window(self.driver.window_handles[0])
+        self.driver.close()
+        self.driver.switch_to.window(self.driver.window_handles[0])
 
 
 class DetailPage(BasePage):
-    def parse(self):
+    def parse(self, data={}):
         self.driver.switch_to.window(self.driver.window_handles[1])
 
         wait = WebDriverWait(self.driver, 100)
         wait.until(EC.presence_of_element_located(
-            DetailPageLocators.NOT_FIRST_ROW))
+            DetailPageLocators.FIRST_ROW))
+        
+        
+        group_containers = self.driver.find_elements(*DetailPageLocators.GROUP_CONTAINER)
+        
+        groups = []
+        
+        for category_container in group_containers:
+            group_name =  category_container.find_element(*DetailPageLocators.GROUP_NAME).text
+            
+            unit_containers = category_container.find_elements(*DetailPageLocators.UNIT_CONTAINER)
+            
+            group = {
+                'name': group_name,
+                'units': []
+            }
+            
+            for unit_container in unit_containers:
+                unit_name = unit_container.find_element(*DetailPageLocators.UNIT_NAME).text
+                
+                unit_details = unit_container.find_elements(*DetailPageLocators.UNIT_DETAILS)
+                
+                unit = {
+                    'name': unit_name,
+                    'details': [],
+                }
+                
+                for detail in unit_details:
+                    detail_name = detail.find_element(*DetailPageLocators.DETAIL_NAME).text
+                    detail_oem = detail.find_element(*DetailPageLocators.DETAIL_OEM).text
+                    detail_pnc = detail.find_element(*DetailPageLocators.DETAIL_PNC).text
+                    detail_note = detail.find_element(*DetailPageLocators.DETAIL_NOTE).text
+                    
+                    detail = {
+                        'name': detail_name,
+                        'oem': detail_oem,
+                        'pnc': detail_pnc,
+                        'note': detail_note,        
+                        }
+                    
+                    if detail['name'] and detail['oem']:
+                        unit['details'].append(detail)
+                    
+                group['units'].append(unit)
+                
+            groups.append(group)
+            
+        data['grouped_details'] = groups
+        
+        http_requests = HttpRequests()
+        
+        response = http_requests.sendData(data)
+                    
+                    
+                  
+            
+         
+        
+        
+        
 
-        group_name = self.driver.find_element(
-            *DetailPageLocators.GROUP_NAME).text
-        subgroup_name = self.driver.find_element(
-            *DetailPageLocators.SUBGROUP_NAME).text
+        # group_name = self.driver.find_element(
+        #     *DetailPageLocators.GROUP_NAME).text
+        # subgroup_name = self.driver.find_element(
+        #     *DetailPageLocators.SUBGROUP_NAME).text
 
-        detail_rows = self.driver.find_elements(
-            *DetailPageLocators.NOT_FIRST_ROW)
-        success(group_name)
-        success(subgroup_name)
+        # detail_rows = self.driver.find_elements(
+        #     *DetailPageLocators.NOT_FIRST_ROW)
+        # success(group_name)
+        # success(subgroup_name)
+        

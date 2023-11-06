@@ -48,6 +48,9 @@ class PartsParser:
             data = {
                 'mark': car_option,
                 'parameters': [],
+                'categories': [],
+                'grouped_details': [],
+                'car_name': '',
             }
 
             mark_model = mark_models.pop(0)
@@ -70,10 +73,13 @@ class PartsParser:
                     f'Checking combo #{index} out of {len(all_combinations)}')
                 if not selects_count and (combo not in parsed_combos):
                     success(f'Combo #{index} is valid')
-                    mark_page.submit()
+                    
+                    
+                    parameters_list = mark_page.getParameters()
 
-                    parameters_list = []
-                    parameters_array = mark_page.getParameters()
+                    data['parameters'] = parameters_list
+                    
+                    mark_page.submit()
 
                     vehicle_page = page.VehiclePage(self.driver)
                     vehicle_rows = vehicle_page.vehicleRows()
@@ -86,7 +92,7 @@ class PartsParser:
                         self.driver.get(link)
                         part_categories_page = page.PartCategoriesPage(
                             self.driver)
-                        part_categories_page.parseEveryLeafCategory()
+                        part_categories_page.parseEveryLeafCategory(data)
 
                     parsed_combos.append(combo)
                 else:

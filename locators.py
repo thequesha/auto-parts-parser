@@ -38,7 +38,19 @@ class VehiclePageLocators(object):
 
 
 class DetailPageLocators(object):
-    NOT_FIRST_ROW = (
-        By.CSS_SELECTOR, '.guayaquil_table .g_collapsed:not(:first-child)')
-    GROUP_NAME = (By.CSS_SELECTOR, '.gdCategory h3:first-child')
-    SUBGROUP_NAME = (By.CSS_SELECTOR, '.gdImageCol a')
+    FIRST_ROW = (
+        By.CSS_SELECTOR, '.guayaquil_table .g_collapsed')
+    
+    # GROUP_NAME = (By.CSS_SELECTOR, '.gdCategory h3:first-child')
+    # SUBGROUP_NAME = (By.CSS_SELECTOR, '.gdImageCol a')
+
+    GROUP_CONTAINER = (By.CSS_SELECTOR, '.gdCategory')
+    GROUP_NAME = (By.CSS_SELECTOR, 'h3')
+    UNIT_CONTAINER = (By.CSS_SELECTOR, '.gdUnit')
+    UNIT_NAME = (By.CSS_SELECTOR, '.gdImageCol a')
+    UNIT_DETAILS = (By.CSS_SELECTOR, '.g_collapsed')
+    
+    DETAIL_NAME = (By.CSS_SELECTOR, 'td[name="c_name"]')
+    DETAIL_OEM = (By.CSS_SELECTOR, 'td[name="c_oem"]')
+    DETAIL_PNC = (By.CSS_SELECTOR, 'td[name="c_pnc"]')
+    DETAIL_NOTE = (By.CSS_SELECTOR, 'td[name="c_note"]')
