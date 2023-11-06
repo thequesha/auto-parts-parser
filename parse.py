@@ -97,7 +97,7 @@ class PartsParser:
                             try:
                                 part_categories_page.parseEveryLeafCategory(data)
                             except:
-                            print('An exception occurred')
+                                print('An exception occurred')
 
                         parsed_combos.append(combo)
                     else:
